@@ -1,9 +1,8 @@
 package best_practices
 
-import cats.Monad
+import cats.{Monad, catsInstancesForId}
 import cats.effect.IO
 import cats.effect.kernel.Sync
-import cats.effect.std.Console
 import cats.implicits.catsSyntaxApplicative
 
 object EncapsulatingState {
@@ -37,6 +36,29 @@ object EncapsulatingState {
       // it will be IO[Counter[IO]].flatMap { counter => ??? }
     }
 
+    trait Console[F[_]] {
+      def print(input: String): F[Unit]
+    }
+
+    object Console {
+      def apply[F[_]](implicit console: Console[F]): Console[F] = console
+    }
+
+    implicit class ConsoleSyntax[A](self: A) {
+      def print[F[_]](implicit console: Console[F]): F[Unit] = console.print(self.toString)
+    }
+
+    implicit val consoleInt: Console[IO] = IO.println(_)
+
+    def genericProgram[F[_] : Monad : Console](counter: Counter[F]): F[Unit] = {
+      for {
+        _ <- counter.get.flatMap(i => Console[F].print(i.toString))
+        _ <- counter.incr
+        _ <- counter.get.flatMap(i => Console[F].print(i.toString))
+      } yield ()
+    }
+
+
     // if you don't like anonymous instances, you can create named class
 
     class LiveCounter[F[_]] private (ref: Ref[F, Int]) extends Counter[F] {
@@ -59,7 +81,6 @@ object EncapsulatingState {
         _ <- counter.get.flatMap(IO.println)
       } yield ()
     }
-
 
   }
 
