@@ -6,7 +6,7 @@ object Typeclass {
   }
 
   object Monoid {
-    def apply[A](implicit semigroup: Monoid[A]): Monoid[A] = semigroup
+    def apply[A](implicit monoid: Monoid[A]): Monoid[A] = monoid
   }
 
   object MonoidInstances {
