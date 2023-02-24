@@ -41,5 +41,27 @@ object Refined extends App {
     val resAlternative: Either[String, NonEmptyString] =
       NonEmptyString.from(str)
 
+
+    import eu.timepit.refined.api.RefinedTypeOps
+    import eu.timepit.refined.numeric.Greater
+
+    type GTFive = Int Refined Greater[5]
+    object GTFive extends RefinedTypeOps[GTFive, Int]
+
+    val number: Int = 33
+
+    val intRes: Either[String, GTFive] = GTFive.from(number)
+
+    // Summarizing, Refined lets us perform runtime validation via Either, which forms a Monad
+    // this means := validation is done sequentially. it would fail on the first error encountered during
+    // multiple value validation. In such cases it is usually a better choice to go for
+    // cats.data.Validated, which is similar to Either, except it only forms an Applicative
+
+    /**In practical terms, this means it can validate data simultaneously and accumulate errors
+     * instead of validating data sequentially and failing fast on the first encountered error.
+     * A common type for such purpose is ValidatedNel[E, A],
+     * which is an alias for Vali- dated[NonEmptyList[E], A].
+     * We can convert those refinement results to this type via the toValidatedNel extension method.
+     */
   }
 }
