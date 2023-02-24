@@ -10,7 +10,7 @@ object StronglyTypedFunctions {
   // - input order can be mismatched
   // - invalid data can be passed, such as "john#   %gmail.com"
   // Solution - value classes
-  def login[F[_]](username: String, email: String): F[Option[User]] = ???
+  def lookup[F[_]](username: String, email: String): F[Option[User]] = ???
 
 
   object value_classes {
@@ -18,7 +18,7 @@ object StronglyTypedFunctions {
     final case class Username(value: String) extends AnyVal
     final case class Email(value: String)    extends AnyVal
 
-    def betterLookup[F[_]](username: Username, email: Email): F[Option[User]] = ???
+    def lookup[F[_]](username: Username, email: Email): F[Option[User]] = ???
     // better but can be improved
     // technique: Smart Constructors - make primary constructors private and expose smart constructors via companion objects
   }
@@ -47,12 +47,12 @@ object StronglyTypedFunctions {
         input.nonEmpty.guard[Option].as(new Email(input) {})
     }
 
-    def betterLookup[F[_]](username: Username, email: Email): F[Option[User]] = ???
+    def lookup[F[_]](username: Username, email: Email): F[Option[User]] = ???
 
     // beautiful, isn't it?
     def client: Unit = {
       (Username.fromString("Chicco"), Email.fromString("Chicco@gmail.com")).mapN { (username, email) =>
-        betterLookup(username, email)
+        lookup(username, email)
       }
     }
 
@@ -74,9 +74,6 @@ object StronglyTypedFunctions {
     // Newtypes do not solve validation; they are just zero-cost wrappers
     // so smart constructors still needed
   }
-
-
-
 
 
 }
