@@ -65,6 +65,16 @@ object StronglyTypedFunctions {
   // - avoid value classes (AnyVal) and sealed abstract case classes and use @newtype library
   // @newtype gives zero cost wrappers with no runtime overhead
 
+  object newtypes {
+    import io.estatico.newtype.macros._
+
+    @newtype case class Username(value: String)
+    @newtype case class Email(value: String)
+
+    // Newtypes do not solve validation; they are just zero-cost wrappers
+    // so smart constructors still needed
+  }
+
 
 
 
